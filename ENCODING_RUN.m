@@ -311,6 +311,8 @@ Conf;
 
 RespOnset = [];
 RespOffset = [];
+PicOnset = [];
+ITIOnset = [];
 
 % Define black and white
 white   = WhiteIndex(screenNumber); 
@@ -384,7 +386,7 @@ for j = trial_indexes
     % the texture full size in the center of the screen.
     imageTexture = Screen('MakeTexture', w, theImage);
     Screen('DrawTextures', w, imageTexture, [], dstRects);
-    Screen('Flip',w);
+    PicOnset(j) = Screen('Flip',w);
     WaitSecs(PICdur);
     
     % indoor or outdoor?
@@ -421,13 +423,13 @@ for j = trial_indexes
     
     % calculate the reaction time
     Resp_rtime(j) = TimePush - RespOnset(j);
-    Screen('Flip',w);
     
     % record reaction time
     RT{j} = Resp_rtime(j);
     
     % display fixation cross for Inter-Trial-Interval
     Screen('FillRect',w,black,FixCross);
+    ITIOnset = Screen('Flip',w);
     WaitSecs(IDLEdur);
     
     % slide metacognition
@@ -462,6 +464,8 @@ BLOCKNOVEL(1).RestOffset = RestOffset;
 BLOCKNOVEL(1).trial_indexes = trial_indexes;
 BLOCKNOVEL(1).RespOnset = RespOnset;
 BLOCKNOVEL(1).RespOffset = RespOffset;
+BLOCKNOVEL(1).PicOnset = PicOnset;
+BLOCKNOVEL(1).ITIOnset = ITIOnset;
 
 end
 
@@ -472,6 +476,8 @@ Conf;
 
 RespOnset = [];
 RespOffset = [];
+PicOnset = [];
+ITIOnset = [];
 
 % Define black and white
 white   = WhiteIndex(screenNumber); 
@@ -545,7 +551,7 @@ for j = trial_indexes
     % the texture full size in the center of the screen.
     imageTexture = Screen('MakeTexture', w, theImage);
     Screen('DrawTextures', w, imageTexture, [], dstRects);
-    Screen('Flip',w);
+    PicOnset(j) = Screen('Flip',w);
     WaitSecs(PICdur);
     
     % indoor or outdoor?
@@ -582,13 +588,13 @@ for j = trial_indexes
     
     % calculate the reaction time
     Resp_rtime(j) = TimePush - RespOnset(j);
-    Screen('Flip',w);
     
     % record reaction time
     RT{j} = Resp_rtime(j);
     
     % display fixation cross for Inter-Trial-Interval
     Screen('FillRect',w,black,FixCross);
+    ITIOnset = Screen('Flip',w);
     WaitSecs(IDLEdur);
     
     % slide metacognition
@@ -623,6 +629,8 @@ BLOCKREPEAT(1).RestOffset = RestOffset;
 BLOCKREPEAT(1).trial_indexes = trial_indexes;
 BLOCKREPEAT(1).RespOnset = RespOnset;
 BLOCKREPEAT(1).RespOffset = RespOffset;
+BLOCKREPEAT(1).PicOnset = PicOnset;
+BLOCKREPEAT(1).ITIOnset = ITIOnset;
 
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -632,6 +640,8 @@ Conf;
 
 RespOnset = [];
 RespOffset = [];
+PicOnset = [];
+ITIOnset = [];
 
 % Define black and white
 white   = WhiteIndex(screenNumber); 
@@ -705,7 +715,7 @@ for j = trial_indexes
     % the texture full size in the center of the screen.
     imageTexture = Screen('MakeTexture', w, theImage);
     Screen('DrawTextures', w, imageTexture, [], dstRects);
-    Screen('Flip',w);
+    PicOnset(j) = Screen('Flip',w);
     WaitSecs(PICdur);
     
     % indoor or outdoor?
@@ -742,13 +752,13 @@ for j = trial_indexes
     
     % calculate the reaction time
     Resp_rtime(j) = TimePush - RespOnset(j);
-    Screen('Flip',w);
     
     % record reaction time
     RT{j} = Resp_rtime(j);
     
     % display fixation cross for Inter-Trial-Interval
     Screen('FillRect',w,black,FixCross);
+    ITIOnset = Screen('Flip',w);
     WaitSecs(IDLEdur);
     
     % slide metacognition
@@ -783,5 +793,7 @@ BLOCKBASE(1).RestOffset = RestOffset;
 BLOCKBASE(1).trial_indexes = trial_indexes;
 BLOCKBASE(1).RespOnset = RespOnset;
 BLOCKBASE(1).RespOffset = RespOffset;
+BLOCKBASE(1).PicOnset = PicOnset;
+BLOCKBASE(1).ITIOnset = ITIOnset;
 
 end
