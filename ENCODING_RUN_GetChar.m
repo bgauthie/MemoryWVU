@@ -33,9 +33,9 @@ rep   = rep(randomization);
 % IDLEdur  = 5;
 % LIMITdur = 3.5;
 
-PICdur   = .1;
-IDLEdur  = .1;
-LIMITdur = .1;
+PICdur   = 1;
+IDLEdur  = 5;
+LIMITdur = 3.5;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% DEFINE KEYS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -153,10 +153,15 @@ rest_instr1 = ['After each block, a fixation cross will be displayed\n ' ...
 
 trig_instr1 = ['Waiting for MRI pulse...'];
 
+if angle == 180
+    verticalfliplag = 1;
+else
+    verticalfliplag = 0;
+end
+
 Screen('TextSize',w, 30);
 Screen('TextFont',w, 'Geneva');
-DrawFormattedText(w, encoding_instr1,...
-    'center', 'center', white);
+DrawFormattedText(w, encoding_instr1,'center', 'center', white,[],verticalfliplag,verticalfliplag);
 Screen('Flip',w);
 
 % while KbCheck
@@ -176,8 +181,7 @@ end
 
 Screen('TextSize',w, 30);
 Screen('TextFont',w, 'Geneva');
-DrawFormattedText(w, encoding_instr2,...
-    'center', 'center', white);
+DrawFormattedText(w, encoding_instr2,'center', 'center', white,[],verticalfliplag,verticalfliplag);
 Screen('Flip',w);
 
 str = [];
@@ -189,8 +193,7 @@ end
 
 Screen('TextSize',w, 30);
 Screen('TextFont',w, 'Geneva');
-DrawFormattedText(w, rest_instr1,...
-    'center', 'center', white);
+DrawFormattedText(w, rest_instr1,'center', 'center', white,[],verticalfliplag,verticalfliplag);
 Screen('Flip',w);
 
 str = [];
@@ -203,7 +206,7 @@ end
 % "Wait for MRI" trigger
 Screen('TextSize',w, 30);
 Screen('TextFont',w, 'Geneva');
-DrawFormattedText(w, trig_instr1,'center', 'center', white);
+DrawFormattedText(w, trig_instr1,'center', 'center', white,[],verticalfliplag,verticalfliplag);
 Screen('Flip',w);
 
 str = [];
@@ -266,7 +269,7 @@ for i = 1:length(conds)
         % launch encoding novel for a fixed number of repetitions
         BLOCKNOVEL{rep(i)} = Encoding_novel(listevents_type,listevents_instance,InDoorImg,OutDoorImg,...
             tagoutdoor,tagindoor,trial_indexes,screenYpixels,screenXpixels,w,...
-            screenNumber,key,X,Y, PICdur, IDLEdur, LIMITdur);
+            screenNumber,key,X,Y, PICdur, IDLEdur, LIMITdur,angle,verticalfliplag);
         
     elseif conds(i) == 2
         % block repeat
@@ -291,7 +294,7 @@ for i = 1:length(conds)
         % launch encoding novel for a fixed number of repetitions
         BLOCKREPEAT{rep(i)} = Encoding_repeat(listevents,InDoorImg,OutDoorImg,tagoutdoor,tagindoor,...
             trial_indexes,screenYpixels,screenXpixels,w,screenNumber,key,...
-            X,Y,  PICdur, IDLEdur, LIMITdur);
+            X,Y,  PICdur, IDLEdur, LIMITdur,angle,verticalfliplag);
         
     elseif conds(i) == 3
         % block baseline
@@ -321,7 +324,7 @@ for i = 1:length(conds)
         % launch encoding novel for a fixed number of repetitions
         BLOCKBASE{rep(i)} = Baseline_block(listevents_type,listevents_instance,InDoorImg,OutDoorImg,...
             tagoutdoor,tagindoor,trial_indexes,screenYpixels,screenXpixels,w,...
-            screenNumber,key,X,Y, PICdur, IDLEdur, LIMITdur);
+            screenNumber,key,X,Y, PICdur, IDLEdur, LIMITdur,angle,verticalfliplag);
         
     end
 end
@@ -335,7 +338,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%% SUBFUNCTIONS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function BLOCKNOVEL = Encoding_novel(listevents_type,listevents_instance,InDoorImg,OutDoorImg,tagoutdoor,tagindoor,trial_indexes,screenYpixels,screenXpixels,w,screenNumber,key,X,Y, PICdur, IDLEdur,LIMITdur)
+function BLOCKNOVEL = Encoding_novel(listevents_type,listevents_instance,InDoorImg,OutDoorImg,tagoutdoor,tagindoor,trial_indexes,screenYpixels,screenXpixels,w,screenNumber,key,X,Y, PICdur, IDLEdur,LIMITdur,angle,verticalfliplag)
 
 Conf;
 
@@ -422,7 +425,7 @@ for j = trial_indexes
     % indoor or outdoor?
         FlushEvents('KeyDown')
     Screen('TextSize', w, 30);
-    DrawFormattedText(w, ['Indoor or Outdoor?'], 'center', 'center', white);
+    DrawFormattedText(w, ['Indoor or Outdoor?'],'center', 'center', white,[],verticalfliplag,verticalfliplag);
     RespOnset(j) = Screen('Flip',w);
        
     % check that time is lower than upper limit
@@ -504,7 +507,7 @@ BLOCKNOVEL(1).ITIOnset = ITIOnset;
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function BLOCKREPEAT = Encoding_repeat(listevents,InDoorImg,OutDoorImg,tagoutdoor,tagindoor,trial_indexes,screenYpixels,screenXpixels,w,screenNumber,key,X,Y, PICdur, IDLEdur,LIMITdur)
+function BLOCKREPEAT = Encoding_repeat(listevents,InDoorImg,OutDoorImg,tagoutdoor,tagindoor,trial_indexes,screenYpixels,screenXpixels,w,screenNumber,key,X,Y, PICdur, IDLEdur,LIMITdur,angle,verticalfliplag)
 
 Conf;
 
@@ -591,7 +594,7 @@ for j = trial_indexes
     % indoor or outdoor?
     FlushEvents('KeyDown')
     Screen('TextSize', w, 30);
-    DrawFormattedText(w, ['Indoor or Outdoor?'], 'center', 'center', white);
+    DrawFormattedText(w, ['Indoor or Outdoor?'],'center', 'center', white,[],verticalfliplag,verticalfliplag);
     RespOnset(j) = Screen('Flip',w);
 
     % check that time is lower than upper limit
@@ -672,7 +675,7 @@ BLOCKREPEAT(1).ITIOnset = ITIOnset;
 
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function BLOCKBASE = Baseline_block(listevents_type,listevents_instance,InDoorImg,OutDoorImg,tagoutdoor,tagindoor,trial_indexes,screenYpixels,screenXpixels,w,screenNumber,key,X,Y, PICdur, IDLEdur,LIMITdur)
+function BLOCKBASE = Baseline_block(listevents_type,listevents_instance,InDoorImg,OutDoorImg,tagoutdoor,tagindoor,trial_indexes,screenYpixels,screenXpixels,w,screenNumber,key,X,Y, PICdur, IDLEdur,LIMITdur,angle,verticalfliplag)
 
 Conf;
 
@@ -759,7 +762,7 @@ for j = trial_indexes
     % indoor or outdoor?
     FlushEvents('KeyDown')
     Screen('TextSize', w, 30);
-    DrawFormattedText(w, ['PUSH'], 'center', 'center', white);
+    DrawFormattedText(w, ['PUSH'],'center', 'center', white,[],verticalfliplag,verticalfliplag);
     RespOnset(j) = Screen('Flip',w);
     tmp = []; tmp = GetSecs;
     

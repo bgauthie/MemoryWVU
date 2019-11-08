@@ -1,5 +1,8 @@
 function RETRIEVAL_RUN(encoding_file)
 
+% initialize the pseudoramdom generator
+rng('default')
+
 % load parameters
 Conf;
 
@@ -30,9 +33,10 @@ reps  = reps(randomization);
 % IDLEdur  = 5;
 % LIMITdur = 3.5;
 
-PICdur   = .1;
-IDLEdur  = .1;
-LIMITdur = .1;
+PICdur   = 1;
+IDLEdur  = 5;
+LIMITdur = 3.5;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% DEFINE KEYS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -186,10 +190,15 @@ rest_instr1 = ['After each block, a fixation cross will be displayed\n ' ...
 
 trig_instr1 = ['Waiting for MRI pulse...'];
 
+if angle == 180
+    verticalfliplag = 1;
+else
+    verticalfliplag = 0;
+end
+
 Screen('TextSize',w, 30);
 Screen('TextFont',w, 'Geneva');
-DrawFormattedText(w, retrieval_instr1,...
-    'center', 'center', white);
+DrawFormattedText(w, retrieval_instr1,'center', 'center', white,[],verticalfliplag,verticalfliplag);
 Screen('Flip',w);
 
 str = [];
@@ -201,8 +210,7 @@ end
 
 Screen('TextSize',w, 30);
 Screen('TextFont',w, 'Geneva');
-DrawFormattedText(w, retrieval_instr2,...
-    'center', 'center', white);
+DrawFormattedText(w, retrieval_instr2,'center', 'center', white,[],verticalfliplag,verticalfliplag);
 Screen('Flip',w);
 
 str = [];
@@ -214,8 +222,7 @@ end
 
 Screen('TextSize',w, 30);
 Screen('TextFont',w, 'Geneva');
-DrawFormattedText(w, retrieval_instr3,...
-    'center', 'center', white);
+DrawFormattedText(w, retrieval_instr3,'center', 'center', white,[],verticalfliplag,verticalfliplag);
 Screen('Flip',w);
 
 str = [];
@@ -228,7 +235,7 @@ end
 % "Wait for MRI" trigger
 Screen('TextSize',w, 30);
 Screen('TextFont',w, 'Geneva');
-DrawFormattedText(w, trig_instr1,'center', 'center', white);
+DrawFormattedText(w, trig_instr1,'center', 'center', white,[],verticalfliplag,verticalfliplag);
 Screen('Flip',w);
 
 str = [];
@@ -331,7 +338,7 @@ for i = 1:length(conds)
         % launch encoding novel for a fixed number of repetitions
         BLOCKRETRIEVAL{reps(i)} = Retrieval_loopBaseline_block(listevents_type,...
             listevents_instance,Img,trial_indexes_retrieval,screenYpixels,screenXpixels,...
-            w,screenNumber,key,X,Y, PICdur, LIMITdur, IDLEdur,angle);
+            w,screenNumber,key,X,Y, PICdur, LIMITdur, IDLEdur,angle,verticalfliplag);
         
     elseif conds(i) == 3
         % block baseline
@@ -361,7 +368,7 @@ for i = 1:length(conds)
         % launch encoding novel for a fixed number of repetitions
         BLOCKBASE{reps(i)} = Baseline_block(listevents_type,listevents_instance,InDoorImg,OutDoorImg,...
             tagoutdoor,tagindoor,trial_indexes_baseline,screenYpixels,screenXpixels,w,...
-            screenNumber,key,X,Y, PICdur, LIMITdur, IDLEdur,angle);
+            screenNumber,key,X,Y, PICdur, LIMITdur, IDLEdur,angle,verticalfliplag);
         
     end
 end
@@ -375,7 +382,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%% SUBFUNCTIONS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function BLOCKRETRIEVAL = Retrieval_loopBaseline_block(listevents_type,listevents_instance,Img,trial_indexes,screenYpixels,screenXpixels,w,screenNumber,key,X,Y, PICdur, LIMITdur, IDLEdur, angle)
+function BLOCKRETRIEVAL = Retrieval_loopBaseline_block(listevents_type,listevents_instance,Img,trial_indexes,screenYpixels,screenXpixels,w,screenNumber,key,X,Y, PICdur, LIMITdur, IDLEdur,angle,verticalfliplag)
 
 RespOnset = [];
 RespOffset = [];
@@ -442,7 +449,7 @@ for j = trial_indexes
     
     % indoor or outdoor?
     Screen('TextSize', w, 30);
-    DrawFormattedText(w, ['old or new?'], 'center', 'center', white);
+    DrawFormattedText(w, ['old or new?'],'center', 'center', white,[],verticalfliplag,verticalfliplag);
     RespOnset(j) = Screen('Flip',w);
     
     % check that time is lower than upper limit
@@ -516,7 +523,7 @@ BLOCKRETRIEVAL(1).ITIOnset = ITIOnset;
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function BLOCKBASE = Baseline_block(listevents_type,listevents_instance,InDoorImg,OutDoorImg,tagoutdoor,tagindoor,trial_indexes,screenYpixels,screenXpixels,w,screenNumber,key,X,Y, PICdur, LIMITdur, IDLEdur, angle)
+function BLOCKBASE = Baseline_block(listevents_type,listevents_instance,InDoorImg,OutDoorImg,tagoutdoor,tagindoor,trial_indexes,screenYpixels,screenXpixels,w,screenNumber,key,X,Y, PICdur, LIMITdur, IDLEdur,angle,verticalfliplag)
 
 Conf;
 
@@ -600,7 +607,7 @@ for j = trial_indexes
     
     % indoor or outdoor?
     Screen('TextSize', w, 30);
-    DrawFormattedText(w, ['PUSH'], 'center', 'center', white);
+    DrawFormattedText(w, ['PUSH'],'center', 'center', white,[],verticalfliplag,verticalfliplag);
     RespOnset(j) = Screen('Flip',w);
     
     % check that time is lower than upper limit
