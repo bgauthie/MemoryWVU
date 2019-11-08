@@ -1,5 +1,8 @@
 function ENCODING_RUN(ID, numrep)
 
+% initialize the pseudoramdom generator
+rng('default')
+
 % load parameters
 Conf;
 
@@ -7,7 +10,7 @@ Conf;
 addpath(conf.dir_stim)
 
 % path for data saving
-Dir = conf.dir_stim;
+Dir     = conf.dir_stim;
 SubDir1 = conf.subdir1;
 SubDir2 =  conf.subdir2;
 
@@ -26,17 +29,27 @@ rep   = rep(randomization);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%% STIM DURATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-PICdur   = 1;
-IDLEdur  = 5;
-LIMITdur = 2.5;
+% PICdur   = 1;
+% IDLEdur  = 5;
+% LIMITdur = 3.5;
+
+PICdur   = .1;
+IDLEdur  = .1;
+LIMITdur = .1;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% DEFINE KEYS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % define keys
-key{1} = 49; %left button
-key{2} = 54; %right button
-key{3} = 53; %MR pulse
+key{1} = 'b'; % left button
+key{2} = 'a'; % right button
+key{3} = 'T'; % MR pulse
+key{4} = ' '; % space bar
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%% PICTURE ORIENTATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+angle = 180;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% DISPLAY PARAMETERS %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -146,9 +159,20 @@ DrawFormattedText(w, encoding_instr1,...
     'center', 'center', white);
 Screen('Flip',w);
 
-while KbCheck
+% while KbCheck
+% end
+% KbWait
+
+KbName('UnifyKeyNames')
+FlushEvents('KeyDown');
+ListenChar(2)
+
+str = [];
+FlushEvents('KeyDown');
+% space bar release check
+while ~strcmp(str,key{4})
+    str = GetChar(0);
 end
-KbWait
 
 Screen('TextSize',w, 30);
 Screen('TextFont',w, 'Geneva');
@@ -156,9 +180,12 @@ DrawFormattedText(w, encoding_instr2,...
     'center', 'center', white);
 Screen('Flip',w);
 
-while KbCheck
+str = [];
+FlushEvents('KeyDown');
+% space bar release check
+while ~strcmp(str,key{4})
+    str = GetChar(0);
 end
-KbWait
 
 Screen('TextSize',w, 30);
 Screen('TextFont',w, 'Geneva');
@@ -166,9 +193,12 @@ DrawFormattedText(w, rest_instr1,...
     'center', 'center', white);
 Screen('Flip',w);
 
-while KbCheck
+str = [];
+FlushEvents('KeyDown');
+% space bar release check
+while ~strcmp(str,key{4})
+    str = GetChar(0);
 end
-KbWait
 
 % "Wait for MRI" trigger
 Screen('TextSize',w, 30);
@@ -176,18 +206,17 @@ Screen('TextFont',w, 'Geneva');
 DrawFormattedText(w, trig_instr1,'center', 'center', white);
 Screen('Flip',w);
 
+str = [];
+FlushEvents('KeyDown');
 % trigger release check
 while 1
-    [keyisdown,secs,keycode] = KbCheck;
-    if keyisdown
-        if find(keycode) == key{3}
-            mri_onset = secs;
-            break;
-        end
+    str = GetChar(0);
+    disp(str)
+    if strcmp(str,key{3})
+        mri_onset = GetSecs;
+        break;
     end
 end
-
-% tic; init_time = toc;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%  MINI BLOCKS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -300,6 +329,7 @@ end
 save([conf.dir_rt '/ENCODING_' ID '_' num2str(numrep) '.mat']);
 
 Screen('CloseAll');
+ListenChar(1)
 
 end
 
@@ -350,7 +380,7 @@ for j = trial_indexes
     % button release check
 %     keyisdown = 1;
 %     while(keyisdown) % first wait until all keys are released
-%         [keyisdown,secs,keycode] = KbCheck;
+%         [keyisdown,GetSecs,keycode] = KbCheck;
 %         WaitSecs(0.001); % delay to prevent CPU hogging
 %     end
     
@@ -385,24 +415,28 @@ for j = trial_indexes
     % Draw the image to the screen, unless otherwise specified PTB will draw
     % the texture full size in the center of the screen.
     imageTexture = Screen('MakeTexture', w, theImage);
-    Screen('DrawTextures', w, imageTexture, [], dstRects);
+    Screen('DrawTextures', w, imageTexture, [], dstRects, angle);
     PicOnset(j) = Screen('Flip',w);
     WaitSecs(PICdur);
     
     % indoor or outdoor?
+        FlushEvents('KeyDown')
     Screen('TextSize', w, 30);
     DrawFormattedText(w, ['Indoor or Outdoor?'], 'center', 'center', white);
     RespOnset(j) = Screen('Flip',w);
-    
+       
     % check that time is lower than upper limit
     while (TagOK == 0) && ((GetSecs - RespOnset(j)) <= LIMITdur)
         % check if one key has been pressed
-        [keyisdown,secs,keycode] = KbCheck;
+        str = [];
+        if CharAvail
+           str = GetChar(0);
+        end
         % check if the right key has been pressed
-        keycode_Resp{j} = find(keycode == 1);
-        if ~isempty(keycode_Resp{j})
-            if (keycode_Resp{j} == key{1}) || (keycode_Resp{j} == key{2})
-                RespOffset(j) = secs;
+        if ~isempty(str)
+            keycode_Resp{j} = str;
+            if strcmp(keycode_Resp{j},key{1}) || strcmp(keycode_Resp{j},key{2})
+                RespOffset(j) = GetSecs;
                 TagOK = 1;
             else
                 TagOK = 0;
@@ -445,7 +479,7 @@ end
 
 % display fixation cross for Resting period
 Screen('FillRect',w,black,FixCross);
-RestOffset = secs;
+RestOffset = GetSecs;
 WaitSecs(5);
 
 % save([conf.dir_rt '/Baseline_' id '_run_' num2str(numrep) '.mat'],...
@@ -515,7 +549,7 @@ for j = trial_indexes
     % button release check
 %     keyisdown = 1;
 %     while(keyisdown) % first wait until all keys are released
-%         [keyisdown,secs,keycode] = KbCheck;
+%         [keyisdown,GetSecs,keycode] = KbCheck;
 %         WaitSecs(0.001); % delay to prevent CPU hogging
 %     end
     
@@ -550,24 +584,28 @@ for j = trial_indexes
     % Draw the image to the screen, unless otherwise specified PTB will draw
     % the texture full size in the center of the screen.
     imageTexture = Screen('MakeTexture', w, theImage);
-    Screen('DrawTextures', w, imageTexture, [], dstRects);
+    Screen('DrawTextures', w, imageTexture, [], dstRects, angle);
     PicOnset(j) = Screen('Flip',w);
     WaitSecs(PICdur);
     
     % indoor or outdoor?
+    FlushEvents('KeyDown')
     Screen('TextSize', w, 30);
     DrawFormattedText(w, ['Indoor or Outdoor?'], 'center', 'center', white);
     RespOnset(j) = Screen('Flip',w);
-    
+
     % check that time is lower than upper limit
     while (TagOK == 0) && ((GetSecs - RespOnset(j)) <= LIMITdur)
         % check if one key has been pressed
-        [keyisdown,secs,keycode] = KbCheck;
+        str = [];
+        if CharAvail
+           str = GetChar(0);
+        end
         % check if the right key has been pressed
-        keycode_Resp{j} = find(keycode == 1);
-        if ~isempty(keycode_Resp{j})
-            if (keycode_Resp{j} == key{1}) || (keycode_Resp{j} == key{2})
-                RespOffset(j) = secs;
+        if ~isempty(str)
+            keycode_Resp{j} = str;
+            if strcmp(keycode_Resp{j},key{1}) || strcmp(keycode_Resp{j},key{2})
+                RespOffset(j) = GetSecs;
                 TagOK = 1;
             else
                 TagOK = 0;
@@ -610,7 +648,7 @@ end
 
 % display fixation cross for Resting period
 Screen('FillRect',w,black,FixCross);
-RestOffset = secs;
+RestOffset = GetSecs;
 WaitSecs(5);
 
 % % save randomization order and RT
@@ -679,7 +717,7 @@ for j = trial_indexes
     % button release check
 %     keyisdown = 1;
 %     while(keyisdown) % first wait until all keys are released
-%         [keyisdown,secs,keycode] = KbCheck;
+%         [keyisdown,GetSecs,keycode] = KbCheck;
 %         WaitSecs(0.001); % delay to prevent CPU hogging
 %     end
     
@@ -714,24 +752,29 @@ for j = trial_indexes
     % Draw the image to the screen, unless otherwise specified PTB will draw
     % the texture full size in the center of the screen.
     imageTexture = Screen('MakeTexture', w, theImage);
-    Screen('DrawTextures', w, imageTexture, [], dstRects);
+    Screen('DrawTextures', w, imageTexture, [], dstRects, angle);
     PicOnset(j) = Screen('Flip',w);
     WaitSecs(PICdur);
     
     % indoor or outdoor?
+    FlushEvents('KeyDown')
     Screen('TextSize', w, 30);
     DrawFormattedText(w, ['PUSH'], 'center', 'center', white);
     RespOnset(j) = Screen('Flip',w);
+    tmp = []; tmp = GetSecs;
     
     % check that time is lower than upper limit
     while (TagOK == 0) && ((GetSecs - RespOnset(j)) <= LIMITdur)
         % check if one key has been pressed
-        [keyisdown,secs,keycode] = KbCheck;
+        str = [];
+        if CharAvail
+           str = GetChar(0);
+        end
         % check if the right key has been pressed
-        keycode_Resp{j} = find(keycode == 1);
-        if ~isempty(keycode_Resp{j})
-            if (keycode_Resp{j} == key{1}) || (keycode_Resp{j} == key{2})
-                RespOffset(j) = secs;
+        if ~isempty(str)
+            keycode_Resp{j} = str;
+            if strcmp(keycode_Resp{j},key{1}) || strcmp(keycode_Resp{j},key{2})
+                RespOffset(j) = GetSecs;
                 TagOK = 1;
             else
                 TagOK = 0;
@@ -774,7 +817,7 @@ end
 
 % display fixation cross for Resting period
 Screen('FillRect',w,black,FixCross);
-RestOffset = secs;
+RestOffset = GetSecs;
 WaitSecs(5);
 
 % save([conf.dir_rt '/Baseline_' id '_run_' num2str(numrep) '.mat'],...

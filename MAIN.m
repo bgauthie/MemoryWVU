@@ -13,11 +13,10 @@ cd(conf.dir_stim)
 ID     = 'Bgauthie';
 
 % acquisition index
-numrep = 041120191511;
+numrep = 071120192318;
 
 %% Stimuli
+ENCODING_RUN_GetChar(ID, numrep)
 
-ENCODING_RUN(ID, numrep)
-
-encoding_file = 'ENCODING_Bgauthie_41120191511.mat';
-RETRIEVAL_RUN(encoding_file)
+encoding_file = 'ENCODING_Bgauthie_71120192318';
+RETRIEVAL_RUN_GetChar(encoding_file)
