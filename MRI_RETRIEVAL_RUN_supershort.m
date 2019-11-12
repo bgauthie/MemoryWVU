@@ -33,9 +33,9 @@ reps  = reps(randomization);
 % IDLEdur  = 5;
 % LIMITdur = 3.5;
 
-PICdur   = 0.5;
-IDLEdur  = 0.5;
-LIMITdur = 1.5;
+PICdur   = 1;
+IDLEdur  = 4;
+LIMITdur = 3.5;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% DEFINE KEYS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
