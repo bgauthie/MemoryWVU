@@ -1,4 +1,4 @@
-function RETRIEVAL_RUN(encoding_file)
+function MRI_RETRIEVAL_RUN_supershort(encoding_file)
 
 % initialize the pseudoramdom generator
 rng('default')
@@ -33,9 +33,9 @@ reps  = reps(randomization);
 % IDLEdur  = 5;
 % LIMITdur = 3.5;
 
-PICdur   = 1;
-IDLEdur  = 5;
-LIMITdur = 3.5;
+PICdur   = 0.5;
+IDLEdur  = 0.5;
+LIMITdur = 1.5;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% DEFINE KEYS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -253,7 +253,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%  MINI BLOCKS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-reorder          = randperm(104);
+reorder          = randperm(52);
 reorder_baseline = randperm(48);
 
 rand_in_img_baseline  = randperm(length(fileListIndoorscrambled));
@@ -261,18 +261,18 @@ rand_out_img_baseline = randperm(length(fileListOutdoorscrambled));
 
 % randomization "OLD" pics
 rand_in_img_old = []; rand_out_img_old = [];
-for i = 1:8
+for i = 1:4
     rand_in_img_old  = [rand_in_img_old  randperm(length(fileListIndoor_old))];
 end
-for i = 1:4
+for i = 1:2
     rand_out_img_old = [rand_out_img_old randperm(length(fileListOutdoor_old))];
 end
 % randomization "NEW" pics
 rand_in_img_new = []; rand_out_img_new = [];
-for i = 1:8
+for i = 1:4
     rand_in_img_new  = [rand_in_img_new  randperm(length(fileListIndoor_new))];
 end
-for i = 1:4
+for i = 1:2
     rand_out_img_new = [rand_out_img_new randperm(length(fileListOutdoor_new))];
 end
 
@@ -280,16 +280,16 @@ for i = 1:length(conds)
     
     if reps(i) == 1
         trial_indexes_baseline  = 1:24;
-        trial_indexes_retrieval = 1:26;
+        trial_indexes_retrieval = 1:13;
     elseif reps(i) == 2
         trial_indexes_baseline = 25:48;
-        trial_indexes_retrieval = 27:52;
+        trial_indexes_retrieval = 14:26;
    elseif reps(i) == 3
        trial_indexes_baseline = 1:24;
-       trial_indexes_retrieval = 53:78;
+       trial_indexes_retrieval = 27:39;
     elseif reps(i) == 4
         trial_indexes_baseline = 25:48;
-        trial_indexes_retrieval = 79:104;
+        trial_indexes_retrieval = 40:52;
     end
     
     if conds(i) == 1
@@ -303,8 +303,8 @@ for i = 1:length(conds)
 %             rand_out_img_old = [rand_out_img_old randperm(length(fileListOutdoor_old))];
 %         end
         InDoorImg_old  = []; OutDoorImg_old = [];
-        InDoorImg_old  = fileListIndoor_old(rand_in_img_old(1:24));
-        OutDoorImg_old = fileListOutdoor_old(rand_out_img_old(1:28));
+        InDoorImg_old  = fileListIndoor_old(rand_in_img_old(1:12));
+        OutDoorImg_old = fileListOutdoor_old(rand_out_img_old(1:14));
         
         % new
 %         rand_in_img_new = []; rand_out_img_new = [];
@@ -315,18 +315,18 @@ for i = 1:length(conds)
 %             rand_out_img_new = [rand_out_img_new randperm(length(fileListOutdoor_new))];
 %         end
         InDoorImg_new  = []; OutDoorImg_new = [];
-        InDoorImg_new  = fileListIndoor_new(rand_in_img_new(1:24));
-        OutDoorImg_new = fileListOutdoor_new(rand_out_img_new(1:28));
+        InDoorImg_new  = fileListIndoor_new(rand_in_img_new(1:12));
+        OutDoorImg_new = fileListOutdoor_new(rand_out_img_new(1:14));
         
         % list of non-repeated events
-        listevents_old = []; listevents_old = [ones(1,24) ones(1,28).*2];
-        listevents_new = []; listevents_new = [ones(1,24).*3 ones(1,28).*4];
+        listevents_old = []; listevents_old = [ones(1,12) ones(1,14).*2];
+        listevents_new = []; listevents_new = [ones(1,12).*3 ones(1,14).*4];
         
         % combine old and new
         listevents_type = []; listevents_instance = [];
-        listevents_type     = [ones(1,24) ones(1,28).*2 ones(1,24).*1 ones(1,28).*2];
-        listevents_instance = [1:24 1:28 ...
-            1:24 1:28 ];
+        listevents_type     = [ones(1,12) ones(1,14).*2 ones(1,12).*1 ones(1,14).*2];
+        listevents_instance = [1:12 1:14 ...
+            1:12 1:14 ];
 %         reorder             = randperm(104);
         listevents_type     = listevents_type(reorder);
         listevents_instance = listevents_instance(reorder);
@@ -498,7 +498,6 @@ end
     
 
 % display fixation cross for Resting period
-Screen('Flip',w);
 Screen('FillRect',w,black,FixCross);
 RestOffset = GetSecs;
 WaitSecs(5);
